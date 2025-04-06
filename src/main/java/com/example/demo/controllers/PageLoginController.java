@@ -15,4 +15,9 @@ public class PageLoginController {
         return "create-user";
     }
 
+    @GetMapping("/register-admin")
+    public String createUserAdminPage() {
+        return "create-user-admin";
+    }
+
 }

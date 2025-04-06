@@ -9,6 +9,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,23 +24,47 @@ public class AuthController {
     @Autowired
     UserService userService;
 
+
+    @Autowired
+    CustomUserDetailsService  customUserDetailsService;
     public AuthController(AuthenticationManager authManager) {
         this.authManager = authManager;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseCookie> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
         var authToken = new UsernamePasswordAuthenticationToken(username, password);
-        authManager.authenticate(authToken); // throws exception if invalid
-        final String token = JwtUtil.generateToken(username);
-        ResponseCookie cookie  = ResponseCookie.from("COOKIE", token).httpOnly(true)
-                .path("/").build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(cookie);
+        authManager.authenticate(authToken);
+
+        var userDetails = customUserDetailsService.loadUserByUsername(username);
+        var roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        String jwt = JwtUtil.generateToken(username, roles);
+        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(86400)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Connecté avec succès");
     }
 
     @PostMapping("/register")
     public String createUser(@RequestParam String username, @RequestParam String password) {
         userService.createUser(
+                username,
+                password
+        );
+        return "utilisateur créé";
+    }
+
+    @PostMapping("/register-admin")
+    public String createUserAdmin(@RequestParam String username, @RequestParam String password) {
+        userService.createUserAdmin(
                 username,
                 password
         );

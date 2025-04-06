@@ -23,13 +23,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user = repo.findByEmail(email)
+        com.example.demo.models.User user = repo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
+
                 //.password("{noop}" +user.getPassword()) // ⚠️ doit être encodé (BCrypt)
-                .roles("USER")
+                .roles(user.getRoleList().toString())
                 .build();
     }
 }
