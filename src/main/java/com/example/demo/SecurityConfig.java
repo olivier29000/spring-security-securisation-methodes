@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,6 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity(
+        prePostEnabled = true,   // pour @PreAuthorize
+        securedEnabled = true,   // pour @Secured
+        jsr250Enabled = true     // pour @RolesAllowed
+)
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -37,7 +43,16 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register-admin", "/auth/register","/log-user", "/register", "/register-admin", "/h2-console/**", "/hello/get-public").permitAll()
+                        .requestMatchers("/auth/login",
+                                "/auth/register-admin",
+                                "/auth/register-super-admin",
+                                "/auth/register",
+                                "/log-user",
+                                "/register",
+                                "/register-admin",
+                                "/register-super-admin",
+                                "/h2-console/**",
+                                "/hello/public").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

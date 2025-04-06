@@ -27,10 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return User.builder()
                 .username(user.getEmail())
-                .password(user.getPassword())
-
-                //.password("{noop}" +user.getPassword()) // ⚠️ doit être encodé (BCrypt)
-                .roles(user.getRoleList().toString())
+                .password(user.getPassword()) // assure-toi qu’il est encodé !
+                .roles(user.getRoleList().toArray(new String[0]))
                 .build();
     }
 }

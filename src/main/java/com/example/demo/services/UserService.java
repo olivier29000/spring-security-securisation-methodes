@@ -40,5 +40,17 @@ public class UserService {
                 )
         );
     }
+    public void createUserSuperAdmin(String username, String password) {
+        List<String> roleList = new ArrayList<>();
+        roleList.add("SUPER_ADMIN");
+        repo.save(
+                new com.example.demo.models.User(
+                        username,
+                        bcrypt.encode(password),
+                        roleList
+                )
+        );
+    }
+
 
 }

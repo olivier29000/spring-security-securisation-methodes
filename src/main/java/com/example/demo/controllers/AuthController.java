@@ -59,7 +59,7 @@ public class AuthController {
                 username,
                 password
         );
-        return "utilisateur créé";
+        return "user créé";
     }
 
     @PostMapping("/register-admin")
@@ -68,6 +68,15 @@ public class AuthController {
                 username,
                 password
         );
-        return "utilisateur créé";
+        return "admin créé";
+    }
+
+    @PostMapping("/register-super-admin")
+    public String createUserSuperAdmin(@RequestParam String username, @RequestParam String password) {
+        userService.createUserSuperAdmin(
+                username,
+                password
+        );
+        return "super-admin créé";
     }
 }

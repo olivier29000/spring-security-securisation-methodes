@@ -20,4 +20,9 @@ public class PageLoginController {
         return "create-user-admin";
     }
 
+    @GetMapping("/register-super-admin")
+    public String createUserSuperAdminPage() {
+        return "create-user-super-admin";
+    }
+
 }
